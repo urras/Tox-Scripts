@@ -132,7 +132,7 @@ gettoxicnc() {
 getavdep(){
   git clone http://git.chromium.org/webm/libvpx.git
   cd libvpx
-  ./configure
+  ./configure -fPIC
   make -j3
   sudo make install
   cd ..
