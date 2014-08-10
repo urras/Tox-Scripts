@@ -73,7 +73,8 @@ gettoxcore() {
   git clone https://github.com/irungentoo/ProjectTox-Core.git
   cd ProjectTox-Core
   autoreconf -if
-  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/
+  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/ \
+  --enable-ntox
   make
   sudo make install
   sudo /sbin/ldconfig
@@ -85,7 +86,8 @@ gettoxcorenc() {
   git clone https://github.com/irungentoo/ProjectTox-Core.git
   cd ProjectTox-Core
   autoreconf -if
-  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/
+  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/ \
+  --enable-ntox
   make
   sudo make install
   sudo /sbin/ldconfig
@@ -123,6 +125,25 @@ gettoxicnc() {
   sudo /sbin/ldconfig
   cd ..
 }
+
+# libvpx and libopus
+# protip: libvpx is in arch repos, libopus in AUR
+getavdep(){
+  git clone http://git.chromium.org/webm/libvpx.git
+  cd libvpx
+  ./configure
+  make -j3
+  sudo make install
+  cd ..
+  wget http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
+  tar xvzf opus-1.0.3.tar.gz
+  cd opus-1.0.3
+  ./configure
+  make -j3
+  sudo make install
+  cd ..
+}
+
 
 # make headers available
 exportlibpath() {
@@ -272,6 +293,7 @@ get_distro_type() {
     [ "$nodep" != "1" ] && sudo pacman -S base-devel vala cmake gtk3 libgee # last 4 optional
     [ "$nolibsm" != "1" ] && getlibsodiumnc && gotlibsm=1
     exportlibpath    && exlibpth=1
+    getavdep         && gotavdep=1
     gettoxcorenc     && gottcore=1
     gettoxicnc       && gottoxic=1
     #getqtgui         && gotqtgui=1
@@ -291,6 +313,7 @@ echo '
 '
 test "$exlibpth" == 1 && echo "[tox.sh] Linked to headers in /usr/local/lib/"
 test "$gotlibsm" == 1 && echo "[tox.sh] Installed libsodium"
+test "$gotavdep" == 1 && echo "[tox.sh] Installed libvpx and libopus"
 test "$gottcore" == 1 && echo "[tox.sh] Installed toxcore"
 test "$gottoxic" == 1 && echo "[tox.sh] Installed toxic"
 test "$gotqtgui" == 1 && echo "[tox.sh] Installed nurupo's Qt GUI"
