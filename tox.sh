@@ -8,12 +8,14 @@
 ## Suggestions, comments and the alike are welcome on http://waa.ai/4vsk
 ##    or send me a mail, to    notadecent  AT  tox  DOT  im
 
-upd=2014/06/25      # Date this script was updated
-com="update toxic build instructions, could be slightly unstable"
+upd=2014/08/10      # Date this script was updated
+com="moved to github.com/Tox/tox-scripts and updated some stuff, \
+    gentoo users should investigate the overlay before applying"
 
 
 # Check if script is being ran as root
-test "$(whoami)" == 'root' && (echo "Please don't run this script as root"; exit 1)
+test "$(whoami)" == 'root' && (echo "[tox.sh] Please don't run this \
+script as root"; exit 1)
 
 # Check for arguments
 nolibsm=0
@@ -47,7 +49,7 @@ getlibsodium() {
   autoreconf -if
   ./autogen.sh
   ./configure --prefix=/usr/local/
-  yes "" | sudo checkinstall --install --pkgname libsodium --pkgversion 0.4.2 --nodoc
+  yes "" | sudo checkinstall --install --pkgname libsodium --pkgversion 0.5.0 --nodoc
   sudo /sbin/ldconfig
   cd ..
 }
@@ -56,7 +58,7 @@ getlibsodium() {
 getlibsodiumnc() {
   git clone https://github.com/jedisct1/libsodium.git
   cd libsodium
-  git checkout tags/0.4.2
+  git checkout tags/0.5.0
   ./autogen.sh
   ./configure --prefix=/usr/local/
   make check
@@ -125,8 +127,10 @@ gettoxicnc() {
 # make headers available
 exportlibpath() {
   if grep -Fxq "/usr/local/" /etc/ld.so.conf.d/locallib.conf; then
-    echo "/etc/ld.so.conf.d/locallib.conf found, skipping"
-    grep --quiet "^/usr/local/lib/$" /etc/ld.so.conf.d/locallib.conf || echo "Make sure you have /usr/local/lib/ in /etc/ld.so.conf.d/locallib.conf, otherwise builds may fail"
+    echo "[tox.sh] /etc/ld.so.conf.d/locallib.conf found, skipping"
+    grep --quiet "^/usr/local/lib/$" /etc/ld.so.conf.d/locallib.conf || echo \
+    "[tox.sh] Make sure you have /usr/local/lib/ in \
+    /etc/ld.so.conf.d/locallib.conf, otherwise builds may fail"
   else
     echo '/usr/local/lib/' | sudo tee -a /etc/ld.so.conf.d/locallib.conf
     sudo /sbin/ldconfig
@@ -162,11 +166,6 @@ getvenom() {
   cd Venom
   mkdir build
   cd build
-  #
-  # GResolverRecordType was added since glib version 2.34
-  # In case if glib is < 2.34, we have to use branch glib_2_32 when cloning Venom (git)
-  # And as long as GResolverRecordType is not used, we have to use djbdns
-  #
   if [ "$(pkg-config --modversion glib-2.0 |cut -f2 -d.)" -lt "34" ]; then
     PKG_CONFIG_PATH=/usr/local/lib/pkgconfig cmake .. -DCMAKE_INSTALL_PREFIX=/usr/ -DDJBDNS_DIRECTORY="../../djbdns-1.05"
   else
@@ -184,7 +183,7 @@ get_distro_type() {
 
   # Fedora / RHEL / CentOS / RedHat derivative
   if [ -r /etc/yum.conf ]; then
-    echo "RHEL / derivative detected"
+    echo "[tox.sh] RHEL / derivative detected"
     [ "$nodep" != "1" ] && {
       sudo yum localinstall --nogpgcheck http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
       sudo yum groupinstall "Development Tools"
@@ -197,7 +196,7 @@ get_distro_type() {
 
   # SUSE
   elif [ -r /etc/SuSE-release ]; then
-    echo "SuSE Linux / derivative detected"
+    echo "[tox.sh] SuSE Linux / derivative detected"
     [ "$nodep" != "1" ] && {
       sudo zypper install ncurses-utils curl autoconf git ffmpeg libconfig-devel libconfig9 check libtool libavcodec55 libvpx libavdevice55 libavformat55 libswscale2 libopenal1 libSDL2-2_0-0 libopus0
       sudo zypper install --type pattern devel_basis
@@ -208,7 +207,7 @@ get_distro_type() {
 
   # Debian / Ubuntu / Mint / Debian derivative
   elif [ -r /etc/apt ]; then
-    echo "Debian Linux / derivative detected"
+    echo "[tox.sh] Debian Linux / derivative detected"
     sudo rm -rf /tmp/tox-update
     mkdir -p /tmp/tox-update
     cd /tmp/tox-update
@@ -233,11 +232,7 @@ get_distro_type() {
     #sudo make && sudo make install
     #cd ..
 
-    #
-    # GResolverRecordType was added since glib version 2.34
-    # In case if glib is < 2.34, we have to use branch glib_2_32 when cloning Venom (git)
-    # And as long as GResolverRecordType is not used, we have to use djbdns
-    #
+
     if [ "$(pkg-config --modversion glib-2.0 |cut -f2 -d.)" -lt "34" ]; then
         mkdir -p /tmp/tox-update
         cd /tmp/tox-update
@@ -259,25 +254,20 @@ get_distro_type() {
     
   # Gentoo / Gentoo derivative
   elif [ -r /etc/gentoo-release ]; then
-    echo "Gentoo Linux / derivative detected"
-    echo "If you run into problems with this script, refer to http://wiki.gentoo.org/wiki/Layman and report problems to notadecent or urras"
-    sudo emerge dev-vcs/git layman
-    sudo layman -f -o https://raw.github.com/fr0stycl34r/gentoo-overlay-tox/master/repository.xml -a tox-overlay
-    sudo layman -S
-    sudo emerge --sync
-    sudo emerge --autounmask-write virtual/ffmpeg
-    sudo emerge --autounmask-write dev-libs/libsodium
-    sudo emerge --autounmask-write net-libs/tox
-    sudo emerge --autounmask-write net-im/toxic
-    sudo echo u | sudo dispatch-conf
-    sudo emerge virtual/ffmpeg
-    sudo emerge dev-libs/libsodium
-    sudo emerge net-libs/tox
-    sudo emerge net-im/toxic
-    
+    echo "[tox.sh] Gentoo Linux / derivative detected"
+    echo "[tox.sh] If things don't go as intended, you should be able to \
+    figure it out on your own."
+    sudo su
+    layman -f -o \
+    https://raw.github.com/fr0stycl34r/gentoo-overlay-tox/master/repository.xml \
+    -a tox-overlay
+    # Don't blame me or fr0stycl34r if something from an other repo borks
+    layman -a qt; layman -S; emerge --sync
+
+
   # Arch / Arch derivative
   elif [ -r /etc/pacman.d/ ]; then
-    echo "Arch Linux / derivative detected"
+    echo "[tox.sh] Arch Linux / derivative detected"
     [ "$nodep" != "1" ] && sudo pacman -S ncurses libconfig qt5-base git curl openal opus libvpx sdl libvorbis ffmpeg
     [ "$nodep" != "1" ] && sudo pacman -S base-devel vala cmake gtk3 libgee # last 4 optional
     [ "$nolibsm" != "1" ] && getlibsodiumnc && gotlibsm=1
@@ -289,7 +279,7 @@ get_distro_type() {
     
   # Other
   else
-    echo "Unknown distro, install manually"
+    echo "[tox.sh] Unknown distro, install manually"
   fi
 }
 
@@ -299,11 +289,11 @@ get_distro_type
 
 echo '
 '
-test "$exlibpth" == 1 && echo "Linked to headers in /usr/local/lib/"
-test "$gotlibsm" == 1 && echo "Installed libsodium"
-test "$gottcore" == 1 && echo "Installed toxcore"
-test "$gottoxic" == 1 && echo "Installed toxic"
-test "$gotqtgui" == 1 && echo "Installed nurupo's Qt GUI"
-test "$gotvenom" == 1 && echo "Installed venom"
+test "$exlibpth" == 1 && echo "[tox.sh] Linked to headers in /usr/local/lib/"
+test "$gotlibsm" == 1 && echo "[tox.sh] Installed libsodium"
+test "$gottcore" == 1 && echo "[tox.sh] Installed toxcore"
+test "$gottoxic" == 1 && echo "[tox.sh] Installed toxic"
+test "$gotqtgui" == 1 && echo "[tox.sh] Installed nurupo's Qt GUI"
+test "$gotvenom" == 1 && echo "[tox.sh] Installed venom"
 
-echo "Done"; exit 0
+echo "[tox.sh] Done"; exit 0
