@@ -48,7 +48,7 @@ getlibsodium() {
   cd libsodium
   autoreconf -if
   ./autogen.sh
-  ./configure --prefix=/usr/local/
+  ./configure --prefix=/usr/local
   yes "" | sudo checkinstall --install --pkgname libsodium --pkgversion 0.5.0 --nodoc
   sudo /sbin/ldconfig
   cd ..
@@ -60,7 +60,7 @@ getlibsodiumnc() {
   cd libsodium
   git checkout tags/0.5.0
   ./autogen.sh
-  ./configure --prefix=/usr/local/
+  ./configure --prefix=/usr/local
   make check
   make
   sudo make install
@@ -73,7 +73,7 @@ gettoxcore() {
   git clone https://github.com/irungentoo/ProjectTox-Core.git
   cd ProjectTox-Core
   autoreconf -if
-  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/ \
+  ./configure --prefix=/usr/local --with-dependency-search=/usr/local \
   --enable-ntox
   make
   sudo make install
@@ -86,7 +86,7 @@ gettoxcorenc() {
   git clone https://github.com/irungentoo/ProjectTox-Core.git
   cd ProjectTox-Core
   autoreconf -if
-  ./configure --prefix=/usr/local/ --with-dependency-search=/usr/local/ \
+  ./configure --prefix=/usr/local --with-dependency-search=/usr/local \
   --enable-ntox
   make
   sudo make install
