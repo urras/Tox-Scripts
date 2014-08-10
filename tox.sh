@@ -10,7 +10,8 @@
 
 upd=2014/08/10      # Date this script was updated
 com="moved to github.com/Tox/tox-scripts and updated some stuff, \
-    gentoo users should investigate the overlay before applying"
+    gentoo users should investigate the overlay before applying, \ 
+    added libvpx and libopus git build for arch"
 
 
 # Check if script is being ran as root
@@ -291,9 +292,9 @@ get_distro_type() {
     echo "[tox.sh] Arch Linux / derivative detected"
     [ "$nodep" != "1" ] && sudo pacman -S ncurses libconfig qt5-base git curl openal opus libvpx sdl libvorbis ffmpeg
     [ "$nodep" != "1" ] && sudo pacman -S base-devel vala cmake gtk3 libgee # last 4 optional
+    [ "$nodep" != "1" ] && getavdep         && gotavdep=1
     [ "$nolibsm" != "1" ] && getlibsodiumnc && gotlibsm=1
     exportlibpath    && exlibpth=1
-    getavdep         && gotavdep=1
     gettoxcorenc     && gottcore=1
     gettoxicnc       && gottoxic=1
     #getqtgui         && gotqtgui=1
