@@ -121,7 +121,7 @@ gettoxicnc() {
   #make
   #sudo make install
   cd toxic/build
-  make
+　PREFIX="/usr/local" PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig/" make
   sudo make install DESTDIR="/usr/"
   sudo /sbin/ldconfig
   cd ..
