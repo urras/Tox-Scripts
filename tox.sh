@@ -88,7 +88,7 @@ gettoxcorenc() {
   cd ProjectTox-Core
   autoreconf -if
   ./configure --prefix=/usr/local --with-dependency-search=/usr/local \
-  --enable-ntox
+  --enable-ntox --enable-static --disable-shared
   make
   sudo make install
   sudo /sbin/ldconfig
