@@ -121,8 +121,13 @@ gettoxicnc() {
   #make
   #sudo make install
   cd toxic/build
-　PREFIX="/usr/local" PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig/" make
-  sudo make install DESTDIR="/usr/"
+  PREFIX="/usr/local/lib/"
+  PREFIX=/usr/ PKG_CONFIG_PATH="/usr/local/lib/pkgconfig/" make
+  sudo PREFIX=/usr/ PKG_CONFIG_PATH="/usr/local/lib/pkgconfig/" make install
+  # no idea what I'm doing here but it works; it took 3 people 4 days to figure
+  # out why this buildsystem messes up this part
+  # if you get an error message about libsodium being needed by other libs and
+  # it refuses to compile, purge all libsodium libraries and compile it again
   sudo /sbin/ldconfig
   cd ..
 }
