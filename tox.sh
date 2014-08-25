@@ -295,8 +295,8 @@ get_distro_type() {
   # Arch / Arch derivative
   elif [ -r /etc/pacman.d/ ]; then
     echo "[tox.sh] Arch Linux / derivative detected"
-    [ "$nodep" != "1" ] && sudo pacman -S ncurses libconfig qt5-base git curl openal opus libvpx sdl libvorbis ffmpeg
-    [ "$nodep" != "1" ] && sudo pacman -S base-devel vala cmake gtk3 libgee # last 4 optional
+    [ "$nodep" != "1" ] && sudo pacman --needed -S ncurses libconfig qt5-base git curl openal opus libvpx sdl libvorbis ffmpeg
+    [ "$nodep" != "1" ] && sudo pacman --needed -S base-devel vala cmake gtk3 libgee # last 4 optional
     [ "$nodep" != "1" ] && getavdep         && gotavdep=1
     [ "$nolibsm" != "1" ] && getlibsodiumnc && gotlibsm=1
     exportlibpath    && exlibpth=1
