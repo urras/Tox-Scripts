@@ -3,7 +3,7 @@ Tox / tox-scripts
 
 * <b>tox.sh</b><br>
 Tox CLI installer, works on various distros and installs libsodium, [toxcore](https://github.com/irungentoo/toxcore/), toxic, venom and nurupo's Qt GUI<br>
-To do: muTox, qTox, installer menu (python2 maybe?), improved argument handling<br>
+<b>To do:</b> muTox, qTox, installer menu (python2 maybe?), improved argument handling, check if latest version is already installed (<i>see build.c</i>).<br>
 Some user-friendliness:<pre>
     wget -O tox.sh waa.ai/iqt && chmod +x ./tox.sh && ./tox.sh
         #fetch latest script and install everything
